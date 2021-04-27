@@ -9,21 +9,23 @@ CM_API_ENDPOINT = "https://api.createsend.com/api/v3.2/"
 SUBSCRIBERS_PATH = "subscribers/"
 LISTS_PATH = "lists/"
 
-def get_subscribers(list_id, api_key, filename):
+## Get unconfirmed subscribers for a given Campaign Monitor list and save as file
+def get_subscribers(list_id, api_key, user, filename):
     url = CM_API_ENDPOINT + LISTS_PATH + list_id + "/unconfirmed.json"
     try:
         with open(filename, 'w') as f:
             c = pycurl.Curl()
             c.setopt(pycurl.URL, url)
             c.setopt(pycurl.HTTPHEADER, ['Accept: application/json'])
-            c.setopt(pycurl.USERPWD, '%s:%s' %(api_key, 'x'))
+            c.setopt(pycurl.USERPWD, '%s:%s' %(api_key, user))
             c.setopt(c.WRITEDATA, f)
             c.perform()
             c.close()
     except:
         print "Error fetching subscribers"
 
-def add_subscribers(list_id, api_key, filename):
+## Iterate over file containing unconfirmed users and re-add subscribers to list, triggering confirmation email
+def add_subscribers(list_id, api_key, user, filename):
     url = CM_API_ENDPOINT + SUBSCRIBERS_PATH + list_id + ".json"
     with open(filename) as f:
         unconfirmed_subscribers = json.load(f)
@@ -42,7 +44,7 @@ def add_subscribers(list_id, api_key, filename):
             c.setopt(pycurl.URL, url)
             c.setopt(pycurl.HTTPHEADER, ['Accept: application/json',
                                             'Content-Type: application/json'])
-            c.setopt(pycurl.USERPWD, '%s:%s' %(api_key, 'x'))
+            c.setopt(pycurl.USERPWD, '%s:%s' %(api_key, user))
             c.setopt(pycurl.POST, 1)
             c.setopt(pycurl.READDATA, subscriber_as_file_object)
             c.setopt(pycurl.POSTFIELDSIZE, len(subscriber_as_json_string))
@@ -50,7 +52,6 @@ def add_subscribers(list_id, api_key, filename):
             print "Response: " + response
             c.close()
 
-#MAIN FUNCTION
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument('-l', '--list_id', type=str)
@@ -58,9 +59,9 @@ def main():
     parser.add_argument('-u', '--user', type=str)
     parser.add_argument('-f', '--filename', type=str)
     args = parser.parse_args()
-    get_unconfirmed_subscribers = get_subscribers(args.list_id, args.api_key, args.filename)
+    get_unconfirmed_subscribers = get_subscribers(args.list_id, args.api_key, args.user, args.filename)
     if path.exists(args.filename):
-        add_unconfirmed_subscribers = add_subscribers(args.list_id, args.api_key, args.filename)
+        add_unconfirmed_subscribers = add_subscribers(args.list_id, args.api_key, args.user, args.filename)
     else:
         print "File " + args.filename + " was not created. Cannot add subscribers."
 

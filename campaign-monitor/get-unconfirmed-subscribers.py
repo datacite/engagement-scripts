@@ -11,6 +11,7 @@ LISTS_PATH = "lists/"
 BATCH_SIZE = 100.0
 TECHNICAL = "Technical"
 SERVICE = "Service"
+OUTPUT_DIR = "tmp/"
 
 ## Get unconfirmed subscribers for a given Campaign Monitor list and save as file
 def get_subscribers(list_id, api_key, user, filename):
@@ -53,7 +54,7 @@ def process_file(filename, excludeBillingVoting):
 
         # determine number of files necessary
         num_files = int(math.ceil(filtered_subscribers_len/BATCH_SIZE))
-        print('File will be split into',num_files,'equal parts')
+        print 'File will be split into ' + str(num_files) + ' equal parts'
 
         split_data = [[] for i in range(0,num_files)]
         starts = [int(math.floor(i * filtered_subscribers_len /num_files)) for i in range(0,num_files)]
@@ -63,10 +64,10 @@ def process_file(filename, excludeBillingVoting):
         for i in range(0,num_files):
             for n in range(starts[i],starts[i+1]):
                split_data[i].append(filtered_subscribers[n])
-            name = os.path.basename(filename).split('.')[0] + '_' + str(i+1) + '.json'
+            name = OUTPUT_DIR + os.path.basename(filename).split('.')[0] + '_' + str(i+1) + '.json'
             with open(name, 'w') as outfile:
                json.dump(split_data[i], outfile)
-            print('Part',str(i+1),'... completed')
+            print 'Part ' + str(i+1) + ' completed'
 
 def main():
     parser = argparse.ArgumentParser()
@@ -76,11 +77,12 @@ def main():
     parser.add_argument('-f', '--filename', type=str)
     parser.add_argument('-x', '--exclude_billing_voting', action='store_true')
     args = parser.parse_args()
-    get_unconfirmed_subscribers = get_subscribers(args.list_id, args.api_key, args.user, args.filename)
-    if path.exists(args.filename):
-        process_file(args.filename, args.exclude_billing_voting)
+    file_path = OUTPUT_DIR + args.filename
+    get_unconfirmed_subscribers = get_subscribers(args.list_id, args.api_key, args.user, file_path)
+    if path.exists(file_path):
+        process_file(file_path, args.exclude_billing_voting)
     else:
-        print "File " + args.filename + " does not exist. Cannot add subscribers."
+        print "File " + file_path + " does not exist. Cannot add subscribers."
 
 if __name__ == '__main__':
   main()

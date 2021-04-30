@@ -4,7 +4,7 @@
 
 - [Install and configure Python](https://wiki.python.org/moin/BeginnersGuide/Download) on your machine
 
-## Get unconfirmed subscriners
+## Get unconfirmed subscribers
 
 This script retrieves the list of unconfirmed subscribers for a specified Campaign Monitor list and splits it files with max 100 subscribers each. Optionally, it can exclude subscribers with only billing or voting roles.
 

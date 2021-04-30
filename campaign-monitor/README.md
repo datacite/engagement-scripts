@@ -16,7 +16,7 @@ This script retrieves the list of unconfirmed subscribers for a specified Campai
 - **api_key:** Find the Campaign Monitor API key in the Campaign Monitor account settings https://lists.datacite.org/account/apikeys
 - **user:** Always "x" (Campaign Monitor API does not use different usernames for each account)
 - **filename:** Name of the file you'd like to add the list of unconfirmed subscribers to, including .json extension, ex "unconfirmed.json"
-- **exclude-billing-voting:** If this argument is present, subscribers will only billing or voting roles are excluded
+- **exclude-billing-voting:** If this argument is present, subscribers with only billing or voting roles are excluded from the resulting files
 
 ## Resend confirmation
 

@@ -10,7 +10,7 @@ This script retrieves the list of subscribers in a specified state (unconfirmed,
 
 ### Usage
 
-    python get-unconfirmed-subscribers.py --list_id "[CAMPAIGN MONITOR LIST ID]" --api_key "[CAMPAIGN MONITOR API KEY]" --user "x"  --filename "unconfirmed.json" -exclude-billing-voting --subscriber_type "unconfirmed"
+    python get-subscribers.py --list_id "[CAMPAIGN MONITOR LIST ID]" --api_key "[CAMPAIGN MONITOR API KEY]" --user "x"  --filename "unconfirmed.json" -exclude-billing-voting --subscriber_type "unconfirmed"
 
 - **list_id:** Find the Campaign Monitor list ID in the list settings (at the bottom of the page), ex https://lists.datacite.org/audience/5ac63db5700ec107/lists/F8091AA5A2563B31/settings?origin=&originId=
 - **api_key:** Find the Campaign Monitor API key in the Campaign Monitor account settings https://lists.datacite.org/account/apikeys

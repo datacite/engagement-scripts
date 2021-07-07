@@ -31,3 +31,22 @@ This script retrieves the list of unconfirmed subscribers for a specified Campai
 - **api_key:** Find the Campaign Monitor API key in the Campaign Monitor account settings https://lists.datacite.org/account/apikeys
 - **user:** Always "x" (Campaign Monitor API does not use different usernames for each account)
 - **filename:** Name of the file you'd like to add the list of unconfirmed subscribers to, including .json extension, ex "unconfirmed.json"
+
+## Resend confirmation to a single subscriber
+To resend a confirmation message to a single user, you can use the Campaign Monitor API directly:
+
+1. Create a JSON with the following data:
+
+        {
+            "EmailAddress": "user@example.org",
+            "Resubscribe": true,
+            "RestartSubscriptionBasedAutoresponders": true,
+            "ConsentToTrack":"No"
+        }
+        
+2. Resend the confirmation email using the file you created:
+
+        curl -X POST -H "Content-Type: application/json" -u "[CAMPAIGN MONITOR API KEY]:x"  -d @/YOUR_FILE_PATH/example_subscriber.json https://api.createsend.com/api/v3.2/subscribers/[CAMPAIGN MONITOR LIST ID].json?pretty=true
+
+        
+

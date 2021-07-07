@@ -35,7 +35,7 @@ This script retrieves the list of unconfirmed subscribers for a specified Campai
 ## Resend confirmation to a single subscriber
 To resend a confirmation message to a single user, you can use the Campaign Monitor API directly:
 
-1. Create a JSON with the following data:
+1. Create a JSON with the following data. See [example_subscriber.json](https://github.com/datacite/engagement-scripts/blob/main/campaign-monitor/example_subscriber.json)
 
         {
             "EmailAddress": "user@example.org",
@@ -44,7 +44,7 @@ To resend a confirmation message to a single user, you can use the Campaign Moni
             "ConsentToTrack":"No"
         }
         
-2. Resend the confirmation email using the file you created:
+2. Resend the confirmation email using the file you created.
 
         curl -X POST -H "Content-Type: application/json" -u "[CAMPAIGN MONITOR API KEY]:x"  -d @/YOUR_FILE_PATH/example_subscriber.json https://api.createsend.com/api/v3.2/subscribers/[CAMPAIGN MONITOR LIST ID].json?pretty=true
 

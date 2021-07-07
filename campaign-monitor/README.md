@@ -48,7 +48,7 @@ To resend a confirmation message to a single user, you can use the Campaign Moni
 
         curl -X POST -H "Content-Type: application/json" -u "[CAMPAIGN MONITOR API KEY]:x"  -d @/YOUR_FILE_PATH/example_subscriber.json https://api.createsend.com/api/v3.2/subscribers/[CAMPAIGN MONITOR LIST ID].json?pretty=true
 
-- list_id: Find the Campaign Monitor list ID in the list settings (at the bottom of the page), ex https://lists.datacite.org/audience/5ac63db5700ec107/lists/F8091AA5A2563B31/settings?origin=&originId=
-- api_key: Find the Campaign Monitor API key in the Campaign Monitor account settings https://lists.datacite.org/account/apikeys
+- **list_id:** Find the Campaign Monitor list ID in the list settings (at the bottom of the page), ex https://lists.datacite.org/audience/5ac63db5700ec107/lists/F8091AA5A2563B31/settings?origin=&originId=
+- **api_key:** Find the Campaign Monitor API key in the Campaign Monitor account settings https://lists.datacite.org/account/apikeys
 user: Always "x" (Campaign Monitor API does not use different usernames for each account)
 

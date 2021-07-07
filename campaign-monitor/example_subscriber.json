@@ -1,0 +1,6 @@
+{
+    "EmailAddress": "user@example.org",
+    "Resubscribe": true,
+    "RestartSubscriptionBasedAutoresponders": true,
+    "ConsentToTrack":"No"
+}

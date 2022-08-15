@@ -1,10 +1,8 @@
 import argparse
-import pycurl
 import json
-import math
-from cStringIO import StringIO
-import os.path
 from os import path
+import requests
+from requests.auth import HTTPBasicAuth
 
 CM_API_ENDPOINT = "https://api.createsend.com/api/v3.2/"
 SUBSCRIBERS_PATH = "subscribers/"
@@ -15,7 +13,7 @@ def add_subscribers(list_id, api_key, user, filename):
     url = CM_API_ENDPOINT + SUBSCRIBERS_PATH + list_id + ".json"
     with open(filename) as f:
         unconfirmed_subscribers = json.load(f)
-        for item in unconfirmed_subscribers:
+        for item in unconfirmed_subscribers["Results"]:
             print("Resending to " + item['EmailAddress'])
             subscriber_dict= {
                 "EmailAddress": (item['EmailAddress']),
@@ -24,19 +22,14 @@ def add_subscribers(list_id, api_key, user, filename):
                 "RestartSubscriptionBasedAutoresponders": True
             }
             subscriber_as_json_string = json.dumps(subscriber_dict)
-            subscriber_as_file_object = StringIO(subscriber_as_json_string)
 
-            c = pycurl.Curl()
-            c.setopt(pycurl.URL, url)
-            c.setopt(pycurl.HTTPHEADER, ['Accept: application/json',
-                                            'Content-Type: application/json'])
-            c.setopt(pycurl.USERPWD, '%s:%s' %(api_key, user))
-            c.setopt(pycurl.POST, 1)
-            c.setopt(pycurl.READDATA, subscriber_as_file_object)
-            c.setopt(pycurl.POSTFIELDSIZE, len(subscriber_as_json_string))
-            response = c.perform_rs()
-            print "Response: " + response
-            c.close()
+            headers = {
+                "accept": "application/json",
+                "content-type": "application/json"
+            }
+            response = requests.request("POST", url, auth = HTTPBasicAuth(api_key, user), headers=headers, data=subscriber_as_json_string)
+            response_json = response.json()
+            print(response_json)
 
 def main():
     parser = argparse.ArgumentParser()
@@ -49,7 +42,7 @@ def main():
     if path.exists(file_path):
         add_unconfirmed_subscribers = add_subscribers(args.list_id, args.api_key, args.user, file_path)
     else:
-        print "File " + file_path + " does not exist. Cannot add subscribers."
+        print("File " + file_path + " does not exist. Cannot add subscribers.")
 
 if __name__ == '__main__':
   main()

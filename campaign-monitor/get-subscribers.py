@@ -1,10 +1,10 @@
 import argparse
-import pycurl
 import json
 import math
-from cStringIO import StringIO
 import os.path
 from os import path
+import requests
+from requests.auth import HTTPBasicAuth
 
 CM_API_ENDPOINT = "https://api.createsend.com/api/v3.2/"
 LISTS_PATH = "lists/"
@@ -18,15 +18,15 @@ def get_subscribers(list_id, api_key, user, filename, subscriber_type):
     url = CM_API_ENDPOINT + LISTS_PATH + list_id + "/" + subscriber_type + ".json"
     try:
         with open(filename, 'w') as f:
-            c = pycurl.Curl()
-            c.setopt(pycurl.URL, url)
-            c.setopt(pycurl.HTTPHEADER, ['Accept: application/json'])
-            c.setopt(pycurl.USERPWD, '%s:%s' %(api_key, user))
-            c.setopt(c.WRITEDATA, f)
-            c.perform()
-            c.close()
+            headers = {
+                "accept": "application/json",
+
+            }
+            response = requests.request("GET", url, auth = HTTPBasicAuth(api_key, user), headers=headers)
+            response_json = response.json()
+            json.dump(response_json, f)
     except:
-        print "Error fetching subscribers"
+        print("Error fetching subscribers")
 
 ## Process unconfirmed subscribers file into batches of 100
 def process_file(filename, excludeBillingVoting):
@@ -54,7 +54,7 @@ def process_file(filename, excludeBillingVoting):
 
         # determine number of files necessary
         num_files = int(math.ceil(filtered_subscribers_len/BATCH_SIZE))
-        print 'File will be split into ' + str(num_files) + ' equal parts'
+        print('File will be split into ' + str(num_files) + ' equal parts')
 
         split_data = [[] for i in range(0,num_files)]
         starts = [int(math.floor(i * filtered_subscribers_len /num_files)) for i in range(0,num_files)]
@@ -67,7 +67,7 @@ def process_file(filename, excludeBillingVoting):
             name = OUTPUT_DIR + os.path.basename(filename).split('.')[0] + '_' + str(i+1) + '.json'
             with open(name, 'w') as outfile:
                json.dump(split_data[i], outfile)
-            print 'Part ' + str(i+1) + ' completed'
+            print('Part ' + str(i+1) + ' completed')
 
 def main():
     parser = argparse.ArgumentParser()
@@ -83,7 +83,7 @@ def main():
     if path.exists(file_path):
         process_file(file_path, args.exclude_billing_voting)
     else:
-        print "File " + file_path + " does not exist. Cannot process subscribers."
+        print("File " + file_path + " does not exist. Cannot process subscribers.")
 
 if __name__ == '__main__':
   main()

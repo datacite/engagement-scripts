@@ -29,25 +29,38 @@ def get_subscribers(list_id, api_key, user, filename, subscriber_type):
         print("Error fetching subscribers")
 
 ## Process unconfirmed subscribers file into batches of 100
-def process_file(filename, excludeBillingVoting):
+def process_file(filename, excludeBillingVoting, memberType):
      with open(filename) as f:
         json_data = json.load(f)
         unconfirmed_subscribers = json_data['Results']
 
-        # Exclude subscribers with only billing or voting roles if arg is set
-        if excludeBillingVoting == True:
-            filtered_subscribers = []
-            for subscriber in unconfirmed_subscribers:
-                roles = []
-                include_subscriber = False
-                for field in subscriber['CustomFields']:
-                    if field['Key'] == '[Type]':
-                        roles.append(field['Value'])
-                if len(roles)==0 or any(TECHNICAL in s for s in roles) or any(SERVICE in s for s in roles):
+        filtered_subscribers = []
+
+        for subscriber in unconfirmed_subscribers:
+            subscriber_roles = []
+            subscriber_member_type = ""
+            include_subscriber = True
+            for field in subscriber['CustomFields']:
+                if field['Key'] == '[Type]':
+                    subscriber_roles.append(field['Value'])
+                if field['Key'] == '[MemberType]':
+                    subscriber_member_type = field['Value']
+                    
+            if excludeBillingVoting == True:
+                # Exclude subscribers with only billing or voting roles if arg is set
+                if len(subscriber_roles)==0 or any(TECHNICAL in s for s in subscriber_roles) or any(SERVICE in s for s in subscriber_roles):
                     include_subscriber = True
-                if include_subscriber == True:
-                    filtered_subscribers.append(subscriber)
-        else:
+                else:
+                    include_subscriber = False
+            if memberType:
+                # Exclude subscribers that are not the requested member type
+                if include_subscriber == True and subscriber_member_type != memberType:
+                    include_subscriber = False
+
+            if include_subscriber == True:
+                filtered_subscribers.append(subscriber)
+                
+        if not excludeBillingVoting and not memberType:
             filtered_subscribers = unconfirmed_subscribers
 
         filtered_subscribers_len = len(filtered_subscribers)
@@ -77,11 +90,12 @@ def main():
     parser.add_argument('-f', '--filename', type=str)
     parser.add_argument('-s', '--subscriber_type', type=str, choices=['active', 'unconfirmed', 'unsubscribed', 'bounced', 'deleted'])
     parser.add_argument('-x', '--exclude_billing_voting', action='store_true')
+    parser.add_argument('-m', '--member_type', type=str)
     args = parser.parse_args()
     file_path = OUTPUT_DIR + args.filename
     subscribers = get_subscribers(args.list_id, args.api_key, args.user, file_path, args.subscriber_type)
     if path.exists(file_path):
-        process_file(file_path, args.exclude_billing_voting)
+        process_file(file_path, args.exclude_billing_voting, args.member_type)
     else:
         print("File " + file_path + " does not exist. Cannot process subscribers.")
 

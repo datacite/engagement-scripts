@@ -1,2 +1,4 @@
 .idea/*
 readme/.env
+readme/*.json
+readme/*.csv

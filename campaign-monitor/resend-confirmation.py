@@ -13,7 +13,9 @@ def add_subscribers(list_id, api_key, user, filename):
     url = CM_API_ENDPOINT + SUBSCRIBERS_PATH + list_id + ".json"
     with open(filename) as f:
         unconfirmed_subscribers = json.load(f)
-        for item in unconfirmed_subscribers["Results"]:
+        if "Results" in unconfirmed_subscribers:
+            unconfirmed_subscribers = unconfirmed_subscribers["Results"]
+        for item in unconfirmed_subscribers:
             print("Resending to " + item['EmailAddress'])
             subscriber_dict= {
                 "EmailAddress": (item['EmailAddress']),

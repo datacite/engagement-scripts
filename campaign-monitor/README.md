@@ -18,6 +18,8 @@ This script retrieves the list of subscribers in a specified state (unconfirmed,
 - **filename:** Name of the file you'd like to add the list of unconfirmed subscribers to, including .json extension, ex "unconfirmed.json"
 - **exclude_billing_voting:** If this argument is present, subscribers with only billing or voting roles are excluded from the resulting files
 - **subscriber_type:** Must be one of: active, unconfirmed, unsubscribed, bounced or deleted
+- **email:** If this argument is present, only the subscriber matching this email address will be included
+
 
 ## Resend confirmation
 

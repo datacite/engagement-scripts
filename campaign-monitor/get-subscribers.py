@@ -29,7 +29,7 @@ def get_subscribers(list_id, api_key, user, filename, subscriber_type):
         print("Error fetching subscribers")
 
 ## Process unconfirmed subscribers file into batches of 100
-def process_file(filename, excludeBillingVoting, memberType):
+def process_file(filename, excludeBillingVoting, memberType, email):
      with open(filename) as f:
         json_data = json.load(f)
         unconfirmed_subscribers = json_data['Results']
@@ -56,17 +56,21 @@ def process_file(filename, excludeBillingVoting, memberType):
                 # Exclude subscribers that are not the requested member type
                 if include_subscriber == True and subscriber_member_type != memberType:
                     include_subscriber = False
+            if email and subscriber["EmailAddress"] != email:
+                # Exclude subscribers other than the specific email address requested
+                include_subscriber = False
 
             if include_subscriber == True:
                 filtered_subscribers.append(subscriber)
                 
-        if not excludeBillingVoting and not memberType:
+        if not excludeBillingVoting and not memberType and not email:
             filtered_subscribers = unconfirmed_subscribers
 
         filtered_subscribers_len = len(filtered_subscribers)
 
         # determine number of files necessary
         num_files = int(math.ceil(filtered_subscribers_len/BATCH_SIZE))
+        print(str(filtered_subscribers_len) + ' subscriber(s) retrieved')
         print('File will be split into ' + str(num_files) + ' equal parts')
 
         split_data = [[] for i in range(0,num_files)]
@@ -91,11 +95,12 @@ def main():
     parser.add_argument('-s', '--subscriber_type', type=str, choices=['active', 'unconfirmed', 'unsubscribed', 'bounced', 'deleted'])
     parser.add_argument('-x', '--exclude_billing_voting', action='store_true')
     parser.add_argument('-m', '--member_type', type=str)
+    parser.add_argument('-e', '--email', type=str)
     args = parser.parse_args()
     file_path = OUTPUT_DIR + args.filename
     subscribers = get_subscribers(args.list_id, args.api_key, args.user, file_path, args.subscriber_type)
     if path.exists(file_path):
-        process_file(file_path, args.exclude_billing_voting, args.member_type)
+        process_file(file_path, args.exclude_billing_voting, args.member_type, args.email)
     else:
         print("File " + file_path + " does not exist. Cannot process subscribers.")
 
